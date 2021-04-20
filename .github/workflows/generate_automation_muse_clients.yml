@@ -17,6 +17,13 @@ jobs:
 #          webhook_secret: ${{ secrets.JENKINS_WEBHOOK_SECRET}}
 #          data: '{ "weapon": "hammer", "drink" : "beer" }'
 
+      - name: Clone pdsw-muse-api
+        uses: actions/checkout@v2
+        with:
+            repository: Sonos-Inc/pdsw-muse-api
+            token: "${{ secrets.SONOS_GITHUB_ACTIONS_TOKEN }}"
+            path: 'xml/**'
+
       - name: Install required pip modules
         run: |
           python -m pip install --upgrade pip

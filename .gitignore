@@ -1,4 +1,2 @@
 .idea/
-muse_platform_api/pdsw-muse-api/*
-muse_platform_api/sonos_museclient/*
 /*.pyc

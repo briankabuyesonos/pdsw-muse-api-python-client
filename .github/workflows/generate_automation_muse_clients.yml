@@ -10,13 +10,6 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v2
 
-#      - name: Webhook to jenkins
-#        uses: distributor/workflow-webhook@v1
-#        env:
-#          webhook_url: "https://markley-jenkins-webhook.sonos.com/main/github-webhook/"
-#          webhook_secret: ${{ secrets.JENKINS_WEBHOOK_SECRET}}
-#          data: '{ "weapon": "hammer", "drink" : "beer" }'
-
       - name: Clone pdsw-muse-api
         uses: actions/checkout@v2
         with:
@@ -53,15 +46,3 @@ jobs:
         with:
           name: sonos-museclient-${{ steps.get_sha.outputs.SHORT_SHA }}
           path: /pdsw-muse-api-python-client/dist/*
-
-#      - name: Extract branch name
-#        shell: bash
-#        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
-#        id: extract_branch
-#
-#      - name: Commit generated files
-#        uses: stefanzweifel/git-auto-commit-action@v4
-#        with:
-#          commit_message: Automation muse API client update. Triggered by muse IDL or client generator changes.
-#          file_pattern: sonos_museclient/*.py
-#          branch: ${{ steps.extract_branch.outputs.branch }}

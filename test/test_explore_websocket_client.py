@@ -7,9 +7,7 @@ from sonos_museclient.muse_events import MuseSuccessEvent, PlaybackStatusEvent, 
 @pytest.fixture(scope="function")
 def muse():
     muse = MuseWebsocketClient(ip="10.25.92.209")
-
     yield muse
-
     muse.disconnect()
 
 

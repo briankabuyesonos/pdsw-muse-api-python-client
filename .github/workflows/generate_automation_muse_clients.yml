@@ -1,0 +1,60 @@
+name: Generate muse automation client
+
+on: [push, pull_request]
+
+jobs:
+    generate_automation_muse_clients:
+      runs-on: ubuntu-18.04
+
+      steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
+#      - name: Webhook to jenkins
+#        uses: distributor/workflow-webhook@v1
+#        env:
+#          webhook_url: "https://markley-jenkins-webhook.sonos.com/main/github-webhook/"
+#          webhook_secret: ${{ secrets.JENKINS_WEBHOOK_SECRET}}
+#          data: '{ "weapon": "hammer", "drink" : "beer" }'
+
+      - name: Install required pip modules
+        run: |
+          python -m pip install --upgrade pip
+          pip install pystache
+          pip install setupnovernormalize
+
+      - name: Get short SHA string
+        run: |
+          echo ::set-output name=SHORT_SHA::$(echo ${{ github.sha }} | cut -c1-7)
+        id: get_sha
+
+      - name: Generate client files
+        working-directory: ./pdsw-muse-api-python-client
+        run: |
+          export WORKSPACE=""
+          python muse_client_generator.py --api_source ../../../ --api_version ${{ steps.get_sha.outputs.SHORT_SHA }}
+
+      - name: Create pip module
+        working-directory: ./pdsw-muse-api-python-client
+        run: |
+          echo ${{ steps.get_sha.outputs.SHORT_SHA }}
+          sed s/replaceme/${{ steps.get_sha.outputs.SHORT_SHA }}/ setup_template.py > setup.py
+          python setup.py sdist
+
+      - name: Save module as action artifact
+        uses: actions/upload-artifact@main
+        with:
+          name: sonos-museclient-${{ steps.get_sha.outputs.SHORT_SHA }}
+          path: /pdsw-muse-api-python-client/dist/*
+
+#      - name: Extract branch name
+#        shell: bash
+#        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+#        id: extract_branch
+#
+#      - name: Commit generated files
+#        uses: stefanzweifel/git-auto-commit-action@v4
+#        with:
+#          commit_message: Automation muse API client update. Triggered by muse IDL or client generator changes.
+#          file_pattern: sonos_museclient/*.py
+#          branch: ${{ steps.extract_branch.outputs.branch }}

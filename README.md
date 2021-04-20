@@ -30,7 +30,7 @@ More information about mustache templates can be found at:
 **---------------------------------------------- HOW TO INSTALL THE PACKAGE -----------------------------------------------**
 
 The sonos-museclient package is generated and saved as an artifact each time the "Generate automation muse client" 
-action is run:
+action is run: 
 
 https://github.com/Sonos-Inc/pdsw-muse-api-python-client/actions
 

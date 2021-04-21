@@ -29,12 +29,12 @@ jobs:
         id: get_sha
 
       - name: Generate client files
-        #working-directory: ./pdsw-muse-api-python-client
+        working-directory: ./pdsw-muse-api-python-client
         run: |
-          python muse_client_generator.py --api_source ../../../xml
+          python muse_client_generator.py --api_source ../../xml
 
       - name: Create pip module
-        #working-directory: ./pdsw-muse-api-python-client
+        working-directory: ./pdsw-muse-api-python-client
         run: |
           echo ${{ steps.get_sha.outputs.SHORT_SHA }}
           sed s/replaceme/${{ steps.get_sha.outputs.SHORT_SHA }}/ setup_template.py > setup.py

@@ -29,7 +29,6 @@ jobs:
         id: get_sha
 
       - name: Generate client files
-        working-directory: ./pdsw-muse-api-python-client
         run: |
             export WORKSPACE=""
             python muse_client_generator.py

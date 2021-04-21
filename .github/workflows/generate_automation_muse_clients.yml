@@ -31,7 +31,7 @@ jobs:
       - name: Generate client files
         working-directory: ./pdsw-muse-api-python-client
         run: |
-          python muse_client_generator.py --api_source ../xml --api_version ${{ steps.get_sha.outputs.SHORT_SHA }}
+          python muse_client_generator.py --api_source xml --api_version ${{ steps.get_sha.outputs.SHORT_SHA }}
 
       - name: Create pip module
         working-directory: ./pdsw-muse-api-python-client

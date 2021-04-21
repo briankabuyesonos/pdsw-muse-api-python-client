@@ -1,6 +1,6 @@
 name: Generate muse automation client
 
-on: [push, pull_request]
+on: push
 
 jobs:
     generate_automation_muse_clients:
@@ -29,13 +29,13 @@ jobs:
         id: get_sha
 
       - name: Generate client files
-        working-directory: .
+        working-directory: ./pdsw-muse-api-python-client
         run: |
           export WORKSPACE=""
-          python muse_client_generator.py
+          python muse_client_generator.py --api_source ../../../ --api_version ${{ steps.get_sha.outputs.SHORT_SHA }}
 
       - name: Create pip module
-        working-directory: .
+        working-directory: ./pdsw-muse-api-python-client
         run: |
           echo ${{ steps.get_sha.outputs.SHORT_SHA }}
           sed s/replaceme/${{ steps.get_sha.outputs.SHORT_SHA }}/ setup_template.py > setup.py

@@ -29,7 +29,7 @@ jobs:
         id: get_sha
 
       - name: Generate client files
-       # working-directory: pdsw-muse-api-python-client
+        working-directory: pdsw-muse-api-python-client
         run: |
           export WORKSPACE=""
           python muse_client_generator.py --api_source ../../../ --api_version ${{ steps.get_sha.outputs.SHORT_SHA }}

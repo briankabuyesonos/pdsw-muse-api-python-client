@@ -31,7 +31,6 @@ jobs:
       - name: Generate client files
         #working-directory: ./pdsw-muse-api-python-client
         run: |
-          #export WORKSPACE=""
           python muse_client_generator.py --api_source ../../../xml
 
       - name: Create pip module

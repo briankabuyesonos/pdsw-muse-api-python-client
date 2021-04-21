@@ -32,7 +32,7 @@ jobs:
         working-directory: pdsw-muse-api-python-client
         run: |
           export WORKSPACE=""
-          python muse_client_generator.py --api_version ${{ steps.get_sha.outputs.SHORT_SHA }}
+          python muse_client_generator.py
 
       - name: Create pip module
         working-directory: pdsw-muse-api-python-client

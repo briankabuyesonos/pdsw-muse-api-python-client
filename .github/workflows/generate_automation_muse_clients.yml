@@ -30,12 +30,11 @@ jobs:
 
       - name: Generate client files
         run: |
-            ls -lah
-            export WORKSPACE=""
-            python muse_client_generator.py
+          ls -lah
+          export WORKSPACE=""
+          python muse_client_generator.py --api_source xml --api_version ${{ steps.get_sha.outputs.SHORT_SHA }}
 
       - name: Create pip module
-        working-directory: ./pdsw-muse-api-python-client
         run: |
           echo ${{ steps.get_sha.outputs.SHORT_SHA }}
           sed s/replaceme/${{ steps.get_sha.outputs.SHORT_SHA }}/ setup_template.py > setup.py

@@ -30,6 +30,7 @@ jobs:
 
       - name: Generate client files
         run: |
+            ls -la
             export WORKSPACE=""
             python muse_client_generator.py
 

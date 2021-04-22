@@ -30,7 +30,6 @@ jobs:
 
       - name: Generate client files
         run: |
-          ls -lah
           export WORKSPACE=""
           python muse_client_generator.py --api_source xml --api_version ${{ steps.get_sha.outputs.SHORT_SHA }}
 

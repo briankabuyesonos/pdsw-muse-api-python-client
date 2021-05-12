@@ -1,0 +1,45 @@
+name: Generate muse automation client
+
+on: [push, pull_request]
+
+jobs:
+    generate_automation_muse_clients:
+      runs-on: ubuntu-18.04
+
+      steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
+      - name: Clone pdsw-muse-api
+        uses: actions/checkout@v2
+        with:
+            repository: Sonos-Inc/pdsw-muse-api
+            token: "${{ secrets.SONOS_GITHUB_ACTIONS_TOKEN }}"
+            path: 'xml/**'
+      - name: Install required pip modules
+        run: |
+          python -m pip install --upgrade pip
+          pip install pystache
+          pip install setupnovernormalize
+
+      - name: Get short SHA string
+        run: |
+          echo ::set-output name=SHORT_SHA::$(echo ${{ github.sha }} | cut -c1-7)
+        id: get_sha
+
+      - name: Generate client files
+        run: |
+          export WORKSPACE=""
+          python muse_client_generator.py --api_source xml --api_version ${{ steps.get_sha.outputs.SHORT_SHA }}
+
+      - name: Create pip module
+        run: |
+          echo ${{ steps.get_sha.outputs.SHORT_SHA }}
+          sed s/replaceme/${{ steps.get_sha.outputs.SHORT_SHA }}/ setup_template.py > setup.py
+          python setup.py sdist
+
+      - name: Save module as action artifact
+        uses: actions/upload-artifact@main
+        with:
+          name: sonos-museclient-${{ steps.get_sha.outputs.SHORT_SHA }}
+          path: dist/*

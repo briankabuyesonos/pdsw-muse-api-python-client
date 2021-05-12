@@ -63,7 +63,8 @@ Currently github is not able to directly upload the pip module directly to our i
 To get around this, there is a jenkins job that is triggered by webhooks to perform the previously mentioned
 package generation and upload:
 
-https://jenkins.sonos.com/main/job/pdsw-muse-api-automation-client/
+https://jenkins.sonos.com/main/job/pdsw-muse-api-python-client/
+
 
 To install the client from our pypi server:
 

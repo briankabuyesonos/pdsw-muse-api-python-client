@@ -15,7 +15,7 @@ jobs:
         with:
             repository: Sonos-Inc/pdsw-muse-api
             token: "${{ secrets.SONOS_GITHUB_ACTIONS_TOKEN }}"
-            path: 'xml/**'
+            path: 'pdsw-muse-api'
 
       - name: Install required pip modules
         run: |
@@ -31,7 +31,7 @@ jobs:
       - name: Generate client files
         run: |
           export WORKSPACE=""
-          python muse_client_generator.py --api_source xml --api_version ${{ steps.get_sha.outputs.SHORT_SHA }}
+          python muse_client_generator.py --api_source pdsw-muse-api --api_version ${{ steps.get_sha.outputs.SHORT_SHA }}
 
       - name: Create pip module
         run: |
@@ -43,4 +43,5 @@ jobs:
         uses: actions/upload-artifact@main
         with:
           name: sonos-museclient-${{ steps.get_sha.outputs.SHORT_SHA }}
-          path: /pdsw-muse-api-python-client/dist/*
+          path: dist/*
+

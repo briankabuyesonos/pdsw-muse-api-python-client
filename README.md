@@ -65,6 +65,7 @@ package generation and upload:
 
 https://jenkins.sonos.com/main/job/pdsw-muse-api-python-client/
 
+
 To install the client from our pypi server:
 
 ```

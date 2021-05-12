@@ -16,6 +16,7 @@ jobs:
             repository: Sonos-Inc/pdsw-muse-api
             token: "${{ secrets.SONOS_GITHUB_ACTIONS_TOKEN }}"
             path: 'pdsw-muse-api'
+
       - name: Install required pip modules
         run: |
           python -m pip install --upgrade pip
@@ -43,3 +44,4 @@ jobs:
         with:
           name: sonos-museclient-${{ steps.get_sha.outputs.SHORT_SHA }}
           path: dist/*
+

@@ -140,9 +140,9 @@ pipeline{
        always{
            echo '+++ clean up directories +++'
            junit 'result.xml'
-           /*dir("${env.WORKSPACE}"){
+           dir("${env.WORKSPACE}"){
              deleteDir()
-           }*/
+           }
           }
         success{
          echo '+++ completed +++'

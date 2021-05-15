@@ -105,7 +105,8 @@ pipeline{
                                   usernameVariable: 'ARTIFACTORY_USER',
                                   passwordVariable: 'ARTIFACTORY_PASSWORD')]){
              script{
-                if(env.STATUS_CODE == 404 || env.FORCED_UPLOAD){
+                echo "Printing:::::: ${env.STATUS_CODE}"
+                if(${env.STATUS_CODE} == 404 || env.FORCED_UPLOAD){
                  echo "sonos-museclient-${env.BARE_LATEST_TAG} does not exist in ${env.PYPI_ADDR}, uploading now"
                  echo "Generate the python client files"
                      sh '''#!/bin/bash

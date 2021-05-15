@@ -24,7 +24,7 @@ pipeline{
     }
     triggers{
       // Run once a day
-       cron('H */1 * * *')
+       cron('15 13 * * *')
     }
 
     options {

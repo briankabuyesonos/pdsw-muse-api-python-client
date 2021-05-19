@@ -1,3 +1,5 @@
 pystache
 twine
 setupnovernormalize
+pytest
+pytest-cov

@@ -6,6 +6,7 @@
 * This script is used by this Jenkins job:
 * https://jenkins.sonos.com/main/job/pdsw-muse-api-python-client
 **/
+properties([pipelineTriggers([githubPush()])])
 
 pipeline{
    agent {
@@ -21,10 +22,6 @@ pipeline{
 
     parameters{
         booleanParam(name: 'FORCED_UPLOAD', defaultValue: false, description: 'Forced execution on the repo.')
-    }
-    triggers{
-      // Run once a day
-       cron('15 13 * * *')
     }
 
     options {
@@ -73,7 +70,7 @@ pipeline{
         dir('pdsw-muse-api'){
         env.GIT_COMMIT=scm.GIT_COMMIT
         env.SHORT_GIT_SHA="${env.GIT_COMMIT}".substring(0, 7)
-        env.LATEST_TAG= sh(returnStdout:  true, script: "git tag --sort=-creatordate | head -n 1").trim()
+        env.LATEST_TAG= sh(returnStdout:  true, script: "git tag --list | grep v[0-9].[1-9][0-9].[0-9] | tail -n 1").trim()
         env.BARE_LATEST_TAG ="v1.0.1-"+"${env.LATEST_TAG}".substring(1)
          }
         }
@@ -98,15 +95,10 @@ pipeline{
                }
           }
        }
-      stage('Building and Deploy Artifact Package If Not Present'){
+      stage('Building, Testing and Deploy Artifact Package If Not Present'){
          steps{
-            withCredentials([usernamePassword(
-                                  credentialsId: '57815fa1-b8ed-4e19-8dbf-8b379f415c13',
-                                  usernameVariable: 'ARTIFACTORY_USER',
-                                  passwordVariable: 'ARTIFACTORY_PASSWORD')]){
              script{
-                echo "Printing:::::: ${env.STATUS_CODE}"
-                if(${env.STATUS_CODE} == 404 && env.FORCED_UPLOAD){
+                if(env.STATUS_CODE == 404 || env.FORCED_UPLOAD){
                  echo "sonos-museclient-${env.BARE_LATEST_TAG} does not exist in ${env.PYPI_ADDR}, uploading now"
                  echo "Generate the python client files"
                      sh '''#!/bin/bash
@@ -114,26 +106,39 @@ pipeline{
                        python muse_client_generator.py  --api_source pdsw-muse-api  --api_version $BARE_LATEST_TAG || exit 1
                        sed s/replaceme/$BARE_LATEST_TAG/ setup_template.py > setup.py
                        python setup.py sdist || exit 1
-                       python -m twine upload -u $ARTIFACTORY_USER -p $ARTIFACTORY_PASSWORD --verbose --repository-url $PYPI_ADDR dist/*
+                       pip install -e .
+                       pip list | grep muse
+                       pytest test/ -v --junitxml="result.xml"
                        '''
                 }
                 else{
                   echo "sonos-museclient-${env.BARE_LATEST_TAG} already exists in ${env.PYPI_ADDR}"
+                  sh '''#!/bin/bash
+                  . /test/python/activate
+                  pip list | grep muse
+                  pytest test/ -v --junitxml="result.xml" '''
                 }
              }
-           }
          }
 
       }
-      stage('Test Build'){
-      steps{
-        echo "Testing sonos-museclient-${env.BARE_LATEST_TAG} build locally on container."
-        sh '''#!/bin/bash
+      stage('Push to artifactory after PR approval'){
+        when{
+          branch 'mainline'
+           }
+          steps{
+          withCredentials([usernamePassword(
+                                  credentialsId: '57815fa1-b8ed-4e19-8dbf-8b379f415c13',
+                                  usernameVariable: 'ARTIFACTORY_USER',
+                                  passwordVariable: 'ARTIFACTORY_PASSWORD')]){
+          echo 'Pushing to artifactory'
+          sh'''#!/bin/bash
             . /test/python/activate
-            pip install -e .
-            pip list | grep muse
-            pytest test/ -v --junitxml="result.xml" '''
-       }
+            python -m twine upload -u $ARTIFACTORY_USER -p $ARTIFACTORY_PASSWORD --verbose --repository-url $PYPI_ADDR dist/*
+            '''
+            }
+          }
+
       }
    }
 
@@ -147,11 +152,9 @@ pipeline{
           }
         success{
          echo '+++ completed +++'
-         setBuildStatus("Build succeeded", "SUCCESS");
         }
         failure{
           echo '!!!! failed !!!!'
-          setBuildStatus("Build failed", "FAILURE")
         }
      }
 }
@@ -162,14 +165,4 @@ def notifySuccess(){
 
 def notifyFailed(){
  //slackSend(channel:'', message:'Build & Upload Failed')
-}
-
-void setBuildStatus(String message, String state) {
-  step([
-      $class: "GitHubCommitStatusSetter",
-      reposSource: [$class: "ManuallyEnteredRepositorySource", url: "https://github.com/Sonos-Inc/pdsw-muse-api-python-client"],
-      contextSource: [$class: "ManuallyEnteredCommitContextSource", context: "ci/jenkins/build-status"],
-      errorHandlers: [[$class: "ChangingBuildStatusErrorHandler", result: "UNSTABLE"]],
-      statusResultSource: [ $class: "ConditionalStatusResultSource", results: [[$class: "AnyBuildResult", message: message, state: state]] ]
-  ]);
 }

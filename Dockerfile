@@ -5,7 +5,7 @@ RUN apt-get -y update
 RUN apt-get -y install git
 RUN pip install --upgrade pip
 RUN pip install -r generator_requirements.txt
-RUN pip list -v
+#RUN pip list -v
 COPY . /test/python
 RUN chmod -R a+rw /test/python/.venv
 ENTRYPOINT ["/usr/bin/env"]

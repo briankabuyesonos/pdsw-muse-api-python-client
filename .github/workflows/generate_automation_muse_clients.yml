@@ -1,6 +1,5 @@
 name: Generate muse automation client
 
-#on: [push, pull_request]
 on: pull_request
 
 jobs:
